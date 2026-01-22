@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch
 import pandas as pd
-import tqdm
+from tqdm import tqdm
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
@@ -18,8 +18,8 @@ max_len = 100
 embedding_dim = 128
 
 print("Loading data...")
-df = pd.read_csv('../dataset/HIV_train.csv')
-df_val = pd.read_csv('../dataset/HIV_validation.csv')
+df = pd.read_csv('dataset\HIV_train.csv')
+df_val = pd.read_csv('dataset\HIV_validation.csv')
 
 tokenizer = SMILESTokenizer()
 
@@ -34,11 +34,14 @@ dataset_val = HIVDataset(df_val, tokenizer, max_len=max_len)
 train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 validation_loader = DataLoader(dataset_val, batch_size=batch_size, shuffle=True)
 
+NUM_HEADS = 4
+NUM_LAYERS = 3
+
 model = HIVMoleculeTransformer(
 vocab_size=vocab_size,
     embed_dim=embedding_dim,
-    num_heads=4,
-    num_layers=3,
+    num_heads=NUM_HEADS,
+    num_layers=NUM_LAYERS,
     max_len=max_len,
     num_classes=2,
     pad_idx=pad_idx
@@ -48,7 +51,7 @@ targets = df["HIV_active"].values
 neg_count = len(targets) - sum(targets)
 pos_count = sum(targets)
 if pos_count > 0:
-    pos_weight = torch.tensor([1.0, neg_count / pos_count]).to(device)
+    pos_weight = torch.tensor([1.0, neg_count / pos_count], dtype=torch.float).to(device)
 else:
     pos_weight = None
 
@@ -99,7 +102,7 @@ for epoch in range(epochs):
 
 print("Saving model...")
 
-# Create a dictionary containing everything needed to run the model later
+
 checkpoint = {
     'model_state_dict': model.state_dict(),
     'vocab_stoi': tokenizer.stoi,
@@ -107,15 +110,15 @@ checkpoint = {
     'config': {
         'vocab_size': vocab_size,
         'embedding_dim': embedding_dim,
-        'num_heads': 4,
-        'num_layers': 3,
+        'num_heads': NUM_HEADS,
+        'num_layers': NUM_LAYERS,
         'max_len': max_len,
         'num_classes': 2,
         'pad_idx': pad_idx
     }
 }
 
-torch.save(checkpoint, 'models/hiv_transformer_checkpoint.pth')
+torch.save(checkpoint, 'models\hiv_transformer1_checkpoint.pth')
 print("Model saved to 'hiv_transformer_checkpoint.pth'")
 
 
