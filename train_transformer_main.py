@@ -18,11 +18,13 @@ MAX_LEN = 100
 
 # Training parameters
 BATCH_SIZE = 64
-EPOCHS = 10
+EPOCHS = 20
 LEARNING_RATE = 0.001
 CRITERION_NAME = 'CrossEntropyLoss'
 OPTIMIZER_NAME = 'Adam'
 IMBALANCE_METHOD = 'weighted_loss'
+
+SAVING_PATH = 'models\hiv_transformer_sampled_20epoch.pth'
 
 def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -54,6 +56,24 @@ def main():
 
     model = trainer.train(batch_size=BATCH_SIZE, epochs=EPOCHS, learning_rate=LEARNING_RATE, max_len=MAX_LEN,
                           criterion_name=CRITERION_NAME, optimizer_name=OPTIMIZER_NAME, imbalance_method=IMBALANCE_METHOD)
+
+    checkpoint = {
+        'model_state_dict': model.state_dict(),
+        'vocab_stoi': tokenizer.stoi,
+        'vocab_itos': tokenizer.itos,
+        'config': {
+            'vocab_size': vocab_size,
+            'embedding_dim': EMBEDDING_DIM,
+            'num_heads': NUM_HEADS,
+            'num_layers': NUM_LAYERS,
+            'max_len': MAX_LEN,
+            'num_classes': 2,
+            'pad_idx': pad_idx
+        }
+    }
+
+    torch.save(checkpoint, SAVING_PATH)
+    print(f"Model saved to '{SAVING_PATH}'")
 
 if __name__ == '__main__':
     main()

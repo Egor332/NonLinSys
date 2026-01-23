@@ -3,7 +3,7 @@ import pandas as pd
 
 testset_path = "dataset/HIV_test.csv"
 
-model_path = "models/hiv_transformer1_checkpoint.pth"
+model_path = "models/hiv_transformer_sampled_20epoch.pth"
 predictor = HIVPredictor(model_path)
 
 df = pd.read_csv(testset_path)
