@@ -1,6 +1,7 @@
 import torch
 import pandas as pd
 from SMILESTokenizer import SMILESTokenizer
+from GELU_transformer import GELUTransformer
 from HIVMoleculeTransformer import HIVMoleculeTransformer
 from transformer_trainer import TransformerTrainer
 
@@ -11,20 +12,24 @@ VALIDATION_PATH = 'dataset\HIV_validation.csv'
 # Transformer parameters
 NUM_HEADS = 4
 NUM_LAYERS = 3
-EMBEDDING_DIM = 128
+EMBEDDING_DIM = 256
+NUM_CLASSES = 1
 
 # Tokenizer parameters
 MAX_LEN = 100
 
 # Training parameters
 BATCH_SIZE = 64
-EPOCHS = 20
-LEARNING_RATE = 0.001
-CRITERION_NAME = 'CrossEntropyLoss'
+EPOCHS = 15
+LEARNING_RATE = 0.0001
+# 'CrossEntropyLoss', 'BCEWithLogitsLoss', 'FocalLoss'
+CRITERION_NAME = 'BCEWithLogitsLoss'
+# 'Adam', 'AdamW'
 OPTIMIZER_NAME = 'Adam'
-IMBALANCE_METHOD = 'weighted_loss'
+# 'weighted_loss' , 'sampler'
+IMBALANCE_METHOD = 'sampler'
 
-SAVING_PATH = 'models\hiv_transformer_sampled_20epoch.pth'
+SAVING_PATH = 'models/GeLU/c1_h4_l3_wS_oA_lB_e15_emb256.pth'
 
 def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -42,13 +47,13 @@ def main():
 
 
 
-    model = HIVMoleculeTransformer(
+    model = GELUTransformer(
         vocab_size=vocab_size,
         embed_dim=EMBEDDING_DIM,
         num_heads=NUM_HEADS,
         num_layers=NUM_LAYERS,
         max_len=MAX_LEN,
-        num_classes=2,
+        num_classes=NUM_CLASSES,
         pad_idx=pad_idx
     ).to(device)
 
@@ -67,7 +72,7 @@ def main():
             'num_heads': NUM_HEADS,
             'num_layers': NUM_LAYERS,
             'max_len': MAX_LEN,
-            'num_classes': 2,
+            'num_classes': NUM_CLASSES,
             'pad_idx': pad_idx
         }
     }

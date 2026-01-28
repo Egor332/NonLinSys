@@ -3,7 +3,7 @@ from rdkit import Chem
 import torch
 import os
 import ast
-
+from rdkit import RDLogger
 
 class SMILESTokenizer:
     def __init__(self):
@@ -20,6 +20,8 @@ class SMILESTokenizer:
 
     def canonicalize(self, smiles):
         """Standardizes SMILES using RDKit"""
+        logger = RDLogger.logger()
+        logger.setLevel(RDLogger.CRITICAL)
         try:
             mol = Chem.MolFromSmiles(smiles)
             if mol is None: return None

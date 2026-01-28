@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from SMILESTokenizer import SMILESTokenizer
 from HIVMoleculeTransformer import HIVMoleculeTransformer
+from GELU_transformer import GELUTransformer
 
 class HIVPredictor:
     def __init__(self, checkpoint_path):
@@ -16,7 +17,7 @@ class HIVPredictor:
         self.max_len = checkpoint["config"]["max_len"]
 
         config = checkpoint["config"]
-        self.model = HIVMoleculeTransformer(
+        self.model = GELUTransformer(
             vocab_size=config['vocab_size'],
             embed_dim=config['embedding_dim'],
             num_heads=config['num_heads'],
@@ -40,15 +41,19 @@ class HIVPredictor:
         input_tensor = token_ids.unsqueeze(0).to(self.device)
 
         with torch.no_grad():
-            logits = self.model(input_tensor)
 
-            probs = torch.softmax(logits, dim=1)
-
-            inactive_prob = probs[0][0].item()
-            active_prob = probs[0][1].item()
-
-            # Determine class
-            predicted_class = torch.argmax(probs, dim=1).item()
+            if self.model.num_classes == 1:
+                logits = self.model(input_tensor)
+                active_prob = torch.sigmoid(logits).item()
+                inactive_prob = 1.0 - active_prob
+                predicted_class = 1 if active_prob >= 0.5 else 0
+            else:
+                logits = self.model(input_tensor)
+                probs = torch.softmax(logits, dim=1)
+                inactive_prob = probs[0][0].item()
+                active_prob = probs[0][1].item()
+                # Determine class
+                predicted_class = torch.argmax(probs, dim=1).item()
 
         return {
             "smiles": smiles,

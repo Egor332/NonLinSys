@@ -6,6 +6,7 @@ from sklearn.metrics import roc_auc_score
 import numpy as np
 from tqdm import tqdm
 from HIVDataset import HIVDataset
+from binary_focal_loss import BinaryFocalLoss
 
 class TransformerTrainer:
     def __init__(self, transformer, tokenizer, df, validation_df, device):
@@ -24,7 +25,9 @@ class TransformerTrainer:
 
         sampler = None
         shuffle = True
-        loss_weight = None
+
+        weight_ce = None
+        pos_weight_bce = None
 
         targets = self.df["HIV_active"].values
         neg_count = len(targets) - sum(targets)
@@ -44,19 +47,23 @@ class TransformerTrainer:
                 replacement=True
             )
             shuffle = False
-
-
         elif imbalance_method == "weighted_loss":
             if pos_count > 0:
-                loss_weight = torch.tensor([1.0, neg_count / pos_count], dtype=torch.float).to(self.device)
+                pos_weight_bce = torch.tensor(neg_count / pos_count, dtype=torch.float).to(self.device)
+
+                weight_ce = torch.tensor([1.0, neg_count / pos_count], dtype=torch.float).to(self.device)
 
 
         train_loader = DataLoader(dataset, batch_size=batch_size, sampler=sampler, shuffle=shuffle)
         validation_loader = DataLoader(validation_dataset, batch_size=batch_size, shuffle=False)
 
 
-        criterion = self._get_criterion(criterion_name, weight=loss_weight)
+        print(f"Weight_ce: {weight_ce}, weight_bce: {pos_weight_bce}")
+
+        criterion = self._get_criterion(criterion_name, weight_ce=weight_ce, pos_weight_bce=pos_weight_bce)
         optimizer = self._get_optimizer(optimizer_name, learning_rate)
+
+        is_binary_loss = criterion_name in ["BCEWithLogitsLoss", "FocalLoss"]
 
         print("Training started...")
 
@@ -72,7 +79,10 @@ class TransformerTrainer:
                 optimizer.zero_grad()
                 outputs = self.transformer(inputs)
 
-                loss = criterion(outputs, labels)
+                if is_binary_loss:
+                    loss = criterion(outputs, labels.unsqueeze(1).float())
+                else:
+                    loss = criterion(outputs, labels)
 
                 loss.backward()
                 optimizer.step()
@@ -92,8 +102,11 @@ class TransformerTrainer:
                     inputs, labels = inputs.to(self.device), labels.to(self.device)
                     outputs = self.transformer(inputs)
 
-
-                    probs = torch.softmax(outputs, dim=1)[:, 1]
+                    if is_binary_loss:
+                        probs = torch.sigmoid(outputs)
+                        probs = probs.squeeze(1)
+                    else:
+                        probs = torch.softmax(outputs, dim=1)[:, 1]  # Shape [B]
 
                     all_probs.extend(probs.cpu().numpy())
                     all_targets.extend(labels.cpu().numpy())
@@ -109,14 +122,20 @@ class TransformerTrainer:
 
         return self.transformer
 
-    def _get_criterion(self, criterion_name, weight=None):
+    def _get_criterion(self, criterion_name, weight_ce=None, pos_weight_bce=None):
         if criterion_name == "CrossEntropyLoss":
-            return nn.CrossEntropyLoss(weight=weight)
+            # Standard CE uses a weight vector [w_neg, w_pos]
+            return nn.CrossEntropyLoss(weight=weight_ce)
+
         elif criterion_name == "BCEWithLogitsLoss":
-            return nn.CrossEntropyLoss(weight=weight)
+            return nn.BCEWithLogitsLoss(pos_weight=pos_weight_bce)
+
+        elif criterion_name == "FocalLoss":
+            return BinaryFocalLoss(gamma=2.0, alpha=0.25, pos_weight=pos_weight_bce)
+
         else:
-            print(f"Warning: Criterion {criterion_name} not found. Using CrossEntropyLoss.")
-            return nn.CrossEntropyLoss(weight=weight)
+            print(f"Warning: Criterion {criterion_name} not found. Defaulting to CrossEntropyLoss.")
+            return nn.CrossEntropyLoss(weight=weight_ce)
 
     def _get_optimizer(self, optimizer_name, lr):
         if optimizer_name == "Adam":
