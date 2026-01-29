@@ -16,18 +16,17 @@ from sklearn.metrics import (
 )
 from tqdm import tqdm
 
-testset_path = "Data/HIV_test.csv"
+TESTSET_PATH = "Data/HIV_test.csv"
 
+MODEL_PATH = "models/GeLU/c1_h4_l3_wW_oA_lB_e10_emb128.pth"
 
-#  model_path = "models/GeLU/c1_h4_l3_wW_oA_lB_e10_emb128.pth"
-model_path = 'models/first15.pth'
-output_plot_path = "evaluation_results.png"
+OUTPUT_PLOT_PATH = "evaluation_results.png"
 
 ACTIVITI_THRESHOLD = 0.5
 
 print("Loading model and dataset...")
-predictor = HIVPredictor(model_path)
-df = pd.read_csv(testset_path)
+predictor = HIVPredictor(MODEL_PATH)
+df = pd.read_csv(TESTSET_PATH)
 
 
 y_true = []
@@ -133,6 +132,6 @@ plt.legend(loc="best")
 plt.grid(alpha=0.3)
 
 plt.tight_layout()
-plt.savefig(output_plot_path)
-print(f"\nPlots saved to {output_plot_path}")
+plt.savefig(OUTPUT_PLOT_PATH)
+print(f"\nPlots saved to {OUTPUT_PLOT_PATH}")
 plt.show()

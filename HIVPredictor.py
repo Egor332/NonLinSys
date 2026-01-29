@@ -1,7 +1,7 @@
 import torch
 from Tokenization.SMILESTokenizer import SMILESTokenizer
 from Transformers.HIVMoleculeTransformer import HIVMoleculeTransformer
-
+from Transformers.GELU_transformer import  GELUTransformer
 
 class HIVPredictor:
     def __init__(self, checkpoint_path):
@@ -25,6 +25,15 @@ class HIVPredictor:
             num_classes=config['num_classes'],
             pad_idx=config['pad_idx']
         )
+        # self.model = GELUTransformer(
+        #     vocab_size=config['vocab_size'],
+        #     embed_dim=config['embedding_dim'],
+        #     num_heads=config['num_heads'],
+        #     num_layers=config['num_layers'],
+        #     max_len=config['max_len'],
+        #     num_classes=config['num_classes'],
+        #     pad_idx=config['pad_idx']
+        # )
 
         self.model.load_state_dict(checkpoint["model_state_dict"])
         self.model.to(self.device)

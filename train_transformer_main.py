@@ -21,15 +21,14 @@ MAX_LEN = 100
 BATCH_SIZE = 512
 EPOCHS = 10
 LEARNING_RATE = 0.00003
-# 'CrossEntropyLoss', 'BCEWithLogitsLoss', 'FocalLoss'
+# Available: 'CrossEntropyLoss', 'BCEWithLogitsLoss', 'FocalLoss'
 CRITERION_NAME = 'BCEWithLogitsLoss'
-# 'Adam', 'AdamW'
+# Available: 'Adam', 'AdamW'
 OPTIMIZER_NAME = 'Adam'
 # 'weighted_loss' , 'sampler'
 IMBALANCE_METHOD = 'weighted_loss'
 
-#SAVING_PATH = 'models/GeLU/c1_h4_l3_wW_oA_lB_e10_emb128.pth'
-SAVING_PATH = 'models/first15.pth'
+SAVING_PATH = 'models/GeLU/c1_h4_l3_wW_oA_lB_e10_emb128.pth'
 
 def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
