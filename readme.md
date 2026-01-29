@@ -33,9 +33,26 @@ Projekt wykorzystujący architekturę Transformer do przewidywania właściwośc
 
 ---
 
+## Środowisko wirtulane 
+Można utworzyć środowisko wirtualne dla projektu
+```bash
+  python -m venv venv_sciezka
+```
+
+Po aktywacji środowiska wirtualnego wymagane biblioteki można pobarać stosując polecenie:
+```bash
+  pip install -r requirements.txt
+```
+
+
 ## Trenowanie nowego transformera
 
-Aby wytrenować nowy model, należy uruchomić plik `train_transformer_main.py`. Konfiguracja parametrów znajduje się na początku tego pliku.
+Aby wytrenować nowy model, należy uruchomić plik `train_transformer_main.py`. 
+```bash
+  python train_transformer_main.py
+```
+Konfiguracja parametrów znajduje się na początku tego pliku.
+
 
 ### Dostępne parametry:
 * `TRAIN_PATH` – ścieżka do zbioru treningowego.
@@ -59,7 +76,11 @@ Aby wytrenować nowy model, należy uruchomić plik `train_transformer_main.py`.
 
 ## Testowanie transformera
 
-Aby przetestować model, należy uruchomić plik `test_transformer.py`. Parametry konfiguracyjne znajdują się na początku pliku.
+Aby przetestować model, należy uruchomić plik `test_transformer.py`. 
+```bash
+  python test_transformer.py
+```
+Parametry konfiguracyjne znajdują się na początku pliku.
 
 ### Dostępne parametry:
 * `TESTSET_PATH` – ścieżka do zbioru testowego.
