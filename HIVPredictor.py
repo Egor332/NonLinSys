@@ -1,8 +1,7 @@
 import torch
-import torch.nn as nn
-from SMILESTokenizer import SMILESTokenizer
-from HIVMoleculeTransformer import HIVMoleculeTransformer
-from GELU_transformer import GELUTransformer
+from Tokenization.SMILESTokenizer import SMILESTokenizer
+from Transformers.HIVMoleculeTransformer import HIVMoleculeTransformer
+
 
 class HIVPredictor:
     def __init__(self, checkpoint_path):
@@ -17,7 +16,7 @@ class HIVPredictor:
         self.max_len = checkpoint["config"]["max_len"]
 
         config = checkpoint["config"]
-        self.model = GELUTransformer(
+        self.model = HIVMoleculeTransformer(
             vocab_size=config['vocab_size'],
             embed_dim=config['embedding_dim'],
             num_heads=config['num_heads'],

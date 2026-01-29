@@ -47,10 +47,10 @@ def split_dataset(file_path):
 
 
 # --- Execution ---
-FILE_PATH = 'dataset/HIV.csv'
-train_file = 'dataset/HIV_train.csv'
-val_file = 'dataset/HIV_validation.csv'
-test_file = 'dataset/HIV_test.csv'
+FILE_PATH = 'HIV.csv'
+train_file = 'HIV_train.csv'
+val_file = 'HIV_validation.csv'
+test_file = 'HIV_test.csv'
 
 df_train, df_val, df_test = split_dataset(FILE_PATH)
 df_train.to_csv(train_file, index=False)

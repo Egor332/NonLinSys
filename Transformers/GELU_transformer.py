@@ -32,7 +32,7 @@ class GELUTransformer(nn.Module):
             nn.Linear(embed_dim, embed_dim),
             nn.LayerNorm(embed_dim),
             nn.GELU(),
-            nn.Dropout(0.1),
+            nn.Dropout(0.3),
             nn.Linear(embed_dim, num_classes)
         )
 

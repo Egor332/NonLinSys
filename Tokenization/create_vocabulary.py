@@ -1,7 +1,7 @@
-from SMILESTokenizer import SMILESTokenizer
+from Tokenization.SMILESTokenizer import SMILESTokenizer
 import pandas as pd
 
-csv_file_path = 'dataset/HIV_train.csv'
+csv_file_path = '../Data/HIV_train.csv'
 df = pd.read_csv(csv_file_path)
 
 tokenizer = SMILESTokenizer()

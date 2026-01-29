@@ -3,10 +3,9 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, WeightedRandomSampler
 from sklearn.metrics import roc_auc_score
-import numpy as np
 from tqdm import tqdm
-from HIVDataset import HIVDataset
-from binary_focal_loss import BinaryFocalLoss
+from Data.HIVDataset import HIVDataset
+from Transformers.binary_focal_loss import BinaryFocalLoss
 
 class TransformerTrainer:
     def __init__(self, transformer, tokenizer, df, validation_df, device):

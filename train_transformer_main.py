@@ -1,35 +1,35 @@
 import torch
 import pandas as pd
-from SMILESTokenizer import SMILESTokenizer
-from GELU_transformer import GELUTransformer
-from HIVMoleculeTransformer import HIVMoleculeTransformer
+from Tokenization.SMILESTokenizer import SMILESTokenizer
+from Transformers.HIVMoleculeTransformer import HIVMoleculeTransformer
 from transformer_trainer import TransformerTrainer
 
 # Data parameters
-TRAIN_PATH = 'dataset\HIV_train.csv'
-VALIDATION_PATH = 'dataset\HIV_validation.csv'
+TRAIN_PATH = 'Data\HIV_train.csv'
+VALIDATION_PATH = 'Data\HIV_validation.csv'
 
 # Transformer parameters
 NUM_HEADS = 4
 NUM_LAYERS = 3
-EMBEDDING_DIM = 256
+EMBEDDING_DIM = 128
 NUM_CLASSES = 1
 
 # Tokenizer parameters
 MAX_LEN = 100
 
 # Training parameters
-BATCH_SIZE = 64
-EPOCHS = 15
-LEARNING_RATE = 0.0001
+BATCH_SIZE = 512
+EPOCHS = 10
+LEARNING_RATE = 0.00003
 # 'CrossEntropyLoss', 'BCEWithLogitsLoss', 'FocalLoss'
 CRITERION_NAME = 'BCEWithLogitsLoss'
 # 'Adam', 'AdamW'
 OPTIMIZER_NAME = 'Adam'
 # 'weighted_loss' , 'sampler'
-IMBALANCE_METHOD = 'sampler'
+IMBALANCE_METHOD = 'weighted_loss'
 
-SAVING_PATH = 'models/GeLU/c1_h4_l3_wS_oA_lB_e15_emb256.pth'
+#SAVING_PATH = 'models/GeLU/c1_h4_l3_wW_oA_lB_e10_emb128.pth'
+SAVING_PATH = 'models/first15.pth'
 
 def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -45,9 +45,7 @@ def main():
     vocab_size = len(tokenizer.stoi)
     pad_idx = tokenizer.stoi[tokenizer.pad_token]
 
-
-
-    model = GELUTransformer(
+    model = HIVMoleculeTransformer(
         vocab_size=vocab_size,
         embed_dim=EMBEDDING_DIM,
         num_heads=NUM_HEADS,
@@ -56,6 +54,16 @@ def main():
         num_classes=NUM_CLASSES,
         pad_idx=pad_idx
     ).to(device)
+
+    # model = GELUTransformer(
+    #     vocab_size=vocab_size,
+    #     embed_dim=EMBEDDING_DIM,
+    #     num_heads=NUM_HEADS,
+    #     num_layers=NUM_LAYERS,
+    #     max_len=MAX_LEN,
+    #     num_classes=NUM_CLASSES,
+    #     pad_idx=pad_idx
+    # ).to(device)
 
     trainer = TransformerTrainer(transformer=model, tokenizer=tokenizer, df=df, validation_df=df_val, device=device)
 

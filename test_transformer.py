@@ -16,8 +16,11 @@ from sklearn.metrics import (
 )
 from tqdm import tqdm
 
-testset_path = "dataset/HIV_test.csv"
-model_path = "models/GeLU/c1_h4_l3_wS_oA_lB_e15_emb256.pth"
+testset_path = "Data/HIV_test.csv"
+
+
+#  model_path = "models/GeLU/c1_h4_l3_wW_oA_lB_e10_emb128.pth"
+model_path = 'models/first15.pth'
 output_plot_path = "evaluation_results.png"
 
 ACTIVITI_THRESHOLD = 0.5
